@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des stagiaires</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e293b;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        #listeStagiaires {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+        }
+
+        .carte {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px #0001;
+        }
+
+        .carte img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .carte h3 {
+            color: #1e293b;
+        }
+
+        .carte p {
+            color: #64748b;
+        }
+
+        #message {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Liste des stagiaires</h1>
+
+    <a href="index.html" class="btn">
+        + Inscrire un stagiaire
+    </a>
+
+    <p id="message">Chargement...</p>
+
+    <div id="listeStagiaires"></div>
+
+</div>
+
+<script>
+    async function chargerStagiaires() {
+        const liste = document.getElementById("listeStagiaires");
+        const message = document.getElementById("message");
+
+        try {
+            // Appeler notre API PHP
+            const reponse = await fetch("api/liste.php");
+
+            const resultat = await reponse.json();
+
+            if (!reponse.ok || !resultat.success) {
+                throw new Error("Erreur de chargement");
+            }
+
+            message.textContent = "";
+
+            // Si la base de données est vide
+            if (resultat.stagiaires.length === 0) {
+                message.textContent =
+                    "Aucun stagiaire inscrit.";
+                return;
+            }
+
+            // Afficher chaque stagiaire
+            resultat.stagiaires.forEach(stagiaire => {
+
+                const carte = document.createElement("div");
+                carte.className = "carte";
+
+                const image = document.createElement("img");
+                image.src = stagiaire.photo;
+                image.alt = "Photo du stagiaire";
+
+                const nom = document.createElement("h3");
+                nom.textContent =
+                    stagiaire.prenom + " " + stagiaire.nom;
+
+                const ville = document.createElement("p");
+                ville.textContent =
+                    "Ville : " + stagiaire.ville;
+
+                carte.appendChild(image);
+                carte.appendChild(nom);
+                carte.appendChild(ville);
+
+                liste.appendChild(carte);
+            });
+
+        } catch (erreur) {
+            message.textContent =
+                "Impossible de charger les stagiaires.";
+        }
+    }
+
+    // Charger la liste au démarrage
+    chargerStagiaires();
+</script>
+
+</body>
+</html>

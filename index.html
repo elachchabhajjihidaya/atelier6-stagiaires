@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription des stagiaires</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 350px;
+            box-shadow: 0 4px 15px #0001;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Inscription d'un stagiaire</h2>
+
+    <form id="formInscription"
+          enctype="multipart/form-data">
+
+        <label>Nom :</label>
+        <input type="text" name="nom" required>
+
+        <label>Prénom :</label>
+        <input type="text" name="prenom" required>
+
+        <label>Ville :</label>
+        <input type="text" name="ville" required>
+
+        <label>Photo :</label>
+        <input type="file" name="photo"
+               accept="image/*" required>
+
+        <button type="submit">Inscrire</button>
+    </form>
+
+    <p id="message"></p>
+
+    <a href="liste.html">
+        Voir la liste des stagiaires
+    </a>
+</div>
+
+<script>
+    // Récupérer le formulaire
+    const form = document.getElementById("formInscription");
+
+    // Quand on clique sur Inscrire
+    form.addEventListener("submit", async function(e) {
+
+        // Empêcher le rechargement de la page
+        e.preventDefault();
+
+        // Récupérer les données du formulaire
+        const donnees = new FormData(form);
+
+        const message = document.getElementById("message");
+        message.textContent = "Inscription en cours...";
+
+        try {
+            // Envoyer les données vers PHP
+            const reponse = await fetch("api/inscrire.php", {
+                method: "POST",
+                body: donnees
+            });
+
+            const resultat = await reponse.json();
+
+            if (reponse.ok && resultat.success) {
+                message.textContent = "Inscription réussie !";
+                form.reset();
+            } else {
+                message.textContent =
+                    resultat.message || "Erreur d'inscription";
+            }
+
+        } catch (erreur) {
+            message.textContent =
+                "Erreur de connexion avec le serveur.";
+        }
+    });
+</script>
+
+</body>
+</html>
