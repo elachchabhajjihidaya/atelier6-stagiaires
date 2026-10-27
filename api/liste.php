@@ -1,4 +1,3 @@
-
 <?php
 
 // Retourner les données au format JSON
