@@ -100,7 +100,22 @@
                 body: donnees
             });
 
-            const resultat = await reponse.json();
+            // Lire d'abord le texte pour distinguer une réponse serveur invalide
+            // d'une vraie erreur réseau (l'insertion peut déjà avoir réussi).
+            const corps = await reponse.text();
+            let resultat;
+            try {
+                resultat = JSON.parse(corps);
+            } catch (erreurJson) {
+                console.error("Réponse invalide de api/inscrire.php", {
+                    status: reponse.status,
+                    corps
+                });
+                message.textContent = reponse.ok
+                    ? "Inscription enregistrée, mais le serveur a renvoyé une réponse illisible."
+                    : `Erreur serveur (${reponse.status}). Consultez les journaux PHP.`;
+                return;
+            }
 
             if (reponse.ok && resultat.success) {
                 message.textContent = "Inscription réussie !";
@@ -111,6 +126,7 @@
             }
 
         } catch (erreur) {
+            console.error("Échec de la requête d'inscription", erreur);
             message.textContent =
                 "Erreur de connexion avec le serveur.";
         }

@@ -1,6 +1,10 @@
 
 <?php
 
+// Empêcher les sorties accidentelles (warnings, espaces des inclusions) de
+// corrompre la réponse JSON attendue par le navigateur.
+ob_start();
+
 // Réponse au format JSON
 header('Content-Type: application/json; charset=utf-8');
 
@@ -101,6 +105,7 @@ try {
     ]);
 
     // 6. Réponse de succès
+    ob_clean();
     echo json_encode([
         'success' => true,
         'message' => 'Stagiaire inscrit avec succès'
@@ -113,6 +118,10 @@ try {
     }
 
     error_log($e->getMessage());
+
+    if (ob_get_level() > 0) {
+        ob_clean();
+    }
 
     echo json_encode([
         'success' => false,
